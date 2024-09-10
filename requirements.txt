@@ -1,0 +1,9 @@
+matplotlib==3.5.1
+numpy==1.21.5
+open3d==0.18.0
+opencv-python
+Pillow==10.4.0
+scipy==1.8.0
+setuptools==59.6.0
+torch==2.1.1
+transformers==4.35.2
