@@ -1,1 +1,4 @@
-perception/__pycache__/
+magpie_perception/__pycache__/
+src/magpie_perception/__pycache__/
+build
+src/magpie_perception.egg-info
