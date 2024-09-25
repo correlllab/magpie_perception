@@ -20,7 +20,7 @@ class LabelOWLv2(Label):
         '''
         super().__init__()
         self.processor = Owlv2Processor.from_pretrained(pth)
-        self.model = Owlv2ForObjectDetection.from_pretrained(pth)
+        self.model = Owlv2ForObjectDetection.from_pretrained(pth, device_map=self.device)
         self.SCORE_THRESHOLD = score_threshold
         self.TOP_K = topk
     
@@ -60,7 +60,7 @@ class LabelOWLv2(Label):
         '''
         img = np.asarray(input_image)
         img_tensor = torch.tensor(img, dtype=torch.float32)
-        inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt")
+        inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt").to(self.device)
         outputs = self.model(**inputs)
         self.dims = img.shape[:2][::-1] # TODO: check if this is correct
         self.W = self.dims[0]

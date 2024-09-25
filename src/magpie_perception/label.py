@@ -6,9 +6,14 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
+import torch
 
 class Label:
-    def __init__(self):
+    def __init__(self, cpu_override="False"):
+        if torch.cuda.is_available() and not cpu_override:
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
         self.TOP_K = 3
         self.sorted = None
         self.dims = None

@@ -26,10 +26,8 @@ class LabelDINO(Label):
         @param camera camera object, expects realsense_wrapper
         '''
         super().__init__()
-
-        device = "cpu"
         self.processor = AutoProcessor.from_pretrained(pth)
-        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(pth).to(device)
+        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(pth).to(self.device)
         self.SCORE_THRESHOLD = score_threshold
         self.TOP_K = topk
 
@@ -90,7 +88,7 @@ class LabelDINO(Label):
         # convert input labels from list of labels to single string of period separated elements.
         input_labels = ". ".join(input_labels) + "."
         # inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt")
-        inputs = self.processor(images=img_tensor, text=input_labels, return_tensors="pt")
+        inputs = self.processor(images=img_tensor, text=input_labels, return_tensors="pt").to(self.device)
         outputs = self.model(**inputs)
         self.dims = img.shape[:2][::-1] # TODO: check if this is correct
         self.W = self.dims[0]
