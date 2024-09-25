@@ -24,7 +24,8 @@ dependencies = [
   'Pillow',
   'opencv-python',
   'open3d',
-  'scipy'
+  'scipy',
+  'accelerate'
 ]
 
 [project.urls]
