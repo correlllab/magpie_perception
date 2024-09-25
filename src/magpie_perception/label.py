@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 class Label:
-    def __init__(self, cpu_override="False"):
+    def __init__(self, cpu_override=False):
         if torch.cuda.is_available() and not cpu_override:
             self.device = torch.device("cuda")
         else:
