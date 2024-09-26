@@ -9,12 +9,13 @@ import numpy as np
 import torch
 
 class Label:
-    def __init__(self, cpu_override=False):
+    def __init__(self, cpu_override=True):
         if torch.cuda.is_available() and not cpu_override:
             self.device = torch.device("cuda")
         else:
             self.device = torch.device("cpu")
         self.TOP_K = 3
+        self.image = None
         self.sorted = None
         self.dims = None
         self.H = None
@@ -50,8 +51,25 @@ class Label:
     def label(self, image, labels):
         pass
 
-    def plot_predictions(self, input_image, text_queries, scores, boxes, labels, topk=False, show_plot=True):
+    def show_plot(self):
+        plt.imshow(self.preds_plot)
+        plt.axis('off')
+        plt.show()
+
+    def plot_predictions(self, index=-1, topk=False, show_plot=True):
         fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+
+        input_image = self.image
+        text_queries = self.queries
+        scores = self.sorted_scores
+        boxes  = self.sorted_boxes_coords
+        labels = self.sorted_labels
+
+        if index >= 0:
+            scores = [self.sorted_scores[index]]
+            boxes  = [self.sorted_boxes_coords[index]]
+            labels = [self.sorted_labels[index]]
+
         ax.imshow(input_image)
         ax.set_axis_off()
 

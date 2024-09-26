@@ -83,7 +83,7 @@ class LabelDINO(Label):
         @return pboxes list of predicted boxes
         @return uboxes list of unnormalized boxes
         '''
-        img = np.asarray(input_image)
+        self.image = img = np.asarray(input_image)
         img_tensor = torch.tensor(img, dtype=torch.float32)
         # convert input labels from list of labels to single string of period separated elements.
         input_labels = ". ".join(input_labels) + "."
@@ -98,6 +98,6 @@ class LabelDINO(Label):
 
         self.queries = abbrev_labels
         scores, labels, boxes, pboxes = self.get_preds(outputs, inputs, target_sizes)
-        self.plot_predictions(img, abbrev_labels, scores, boxes, labels, topk=topk, show_plot=plot)
+        self.plot_predictions(topk=topk, show_plot=plot)
         return self.results, self.sorted_boxes_coords, self.sorted_scores, self.sorted_labels
 

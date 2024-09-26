@@ -68,7 +68,7 @@ class LabelOWLViT(Label):
         @return pboxes list of predicted boxes
         @return uboxes list of unnormalized boxes
         '''
-        img = np.asarray(input_image)
+        self.image = img = np.asarray(input_image)
         img_tensor = torch.tensor(img, dtype=torch.float32)
         inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt")
         outputs = self.model(**inputs)
@@ -79,7 +79,6 @@ class LabelOWLViT(Label):
         self.queries = abbrev_labels
         scores, labels, boxes, pboxes = self.get_preds(outputs, target_sizes)
         # image_plt = img.astype(np.float32) / 255.0
-        image_plt = img
-        self.plot_predictions(image_plt, abbrev_labels, scores, boxes, labels, topk=topk, show_plot=plot)
+        self.plot_predictions(topk=topk, show_plot=plot)
         return self.results, self.sorted_boxes_coords, self.sorted_scores, self.sorted_labels
 

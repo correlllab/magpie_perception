@@ -14,11 +14,11 @@ import matplotlib.patches as patches
 from PIL import Image
 
 class LabelOWLv2(Label):
-    def __init__(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble"):
+    def __init__(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble", cpu_override=True):
         '''
         @param camera camera object, expects realsense_wrapper
         '''
-        super().__init__()
+        super().__init__(cpu_override=cpu_override)
         self.processor = Owlv2Processor.from_pretrained(pth)
         self.model = Owlv2ForObjectDetection.from_pretrained(pth, device_map=self.device)
         self.SCORE_THRESHOLD = score_threshold
@@ -58,7 +58,7 @@ class LabelOWLv2(Label):
         @return pboxes list of predicted boxes
         @return uboxes list of unnormalized boxes
         '''
-        img = np.asarray(input_image)
+        self.image = img = np.asarray(input_image)
         img_tensor = torch.tensor(img, dtype=torch.float32)
         inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt").to(self.device)
         outputs = self.model(**inputs)
@@ -70,6 +70,6 @@ class LabelOWLv2(Label):
         
         self.queries = abbrev_labels
         scores, labels, boxes, pboxes = self.get_preds(outputs, target_sizes)
-        self.plot_predictions(img, abbrev_labels, scores, boxes, labels, topk=topk, show_plot=plot)
+        self.plot_predictions(topk=topk, show_plot=plot)
         return self.results, self.sorted_boxes_coords, self.sorted_scores, self.sorted_labels
 
