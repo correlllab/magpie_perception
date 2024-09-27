@@ -6,7 +6,6 @@ import os
 
 class Mask:
     def __init__(self):
-        self.api_key = os.environ.get('SAM_API_KEY')
         self.dims = None
         self.H = None
         self.W = None
