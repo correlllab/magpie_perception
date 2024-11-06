@@ -9,6 +9,7 @@ from scipy.spatial.transform import Rotation as R
 from open3d.web_visualizer import draw
 import copy
 
+
 def create_depth_mask_from_mask(mask, orig_depth):
     '''
     @param mask np.array of item mask
@@ -19,6 +20,7 @@ def create_depth_mask_from_mask(mask, orig_depth):
     depth_m_array[~mask] = 0
     depth_m = o3d.geometry.Image((depth_m_array).astype(np.float32))
     return depth_m
+
 
 def crop_and_denoise_pcd(depth_m, orig_pcd, rsc, NB=50):
     '''
@@ -50,12 +52,14 @@ def crop_and_denoise_pcd(depth_m, orig_pcd, rsc, NB=50):
 
     return inlier_cloud
 
+
 def get_minimum_width(pcd):
     mobb = pcd.get_minimal_oriented_bounding_box()
     obb  = pcd.get_oriented_bounding_box()
     mobb.extent, obb.extent
     width = np.min([*mobb.extent[:3], *obb.extent[:3]])
     return width
+
 
 def retrieve_mask_from_image_crop(box, full_o3d_image):
     '''
@@ -109,17 +113,20 @@ def retrieve_mask_from_image_crop(box, full_o3d_image):
 
     return depth_m, rgb_m, rgbd_m_image
 
+
 def display_world(world_pcd):
     coordFrame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05)
     geometry = [coordFrame]
     geometry.append(world_pcd)
     o3d.visualization.draw_geometries(geometry)
 
+
 def display_world_nb(world_pcd):
     coordFrame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05)
     geometry = [coordFrame]
     geometry.append(world_pcd)
     draw(geometry)
+
 
 def apply_extrinsics(pcd):
     # Applies extrinsics to the camera frame
@@ -134,6 +141,7 @@ def apply_extrinsics(pcd):
     pcd.rotate(rot) # account for camera orientation, which is -pi/2 about z-axis relative to ur5 wrist
     pcd.transform(tmat_camera) # account for camera position relative to ur5 wrist
     return pcd
+
 
 def get_segment(segments, index, rgbd_image, rsc, type="box", viz_scale=1500.0, method='iterative', display=True):
     '''
@@ -189,6 +197,7 @@ def get_segment(segments, index, rgbd_image, rsc, type="box", viz_scale=1500.0, 
 
     return rgbd_image, cpcd, tmat, pcaFrame
 
+
 # pca helper functions
 def find_duplicate_values_and_indices(arr):
     unique_values, unique_indices = np.unique(arr, return_inverse=True)
@@ -198,11 +207,13 @@ def find_duplicate_values_and_indices(arr):
     indices_of_duplicates = [np.where(unique_indices == i)[0] for i in duplicate_indices]
     return duplicate_values, indices_of_duplicates
 
+
 def contains_duplicates(arr):
     # Count occurrences of each element
     unique, counts = np.unique(arr, return_counts=True)
     # Check if any element has more than one occurrence
     return np.any(counts > 1)
+
 
 # chatgpt code to align pca with x, y, z axes
 def rotation_matrix_to_align_with_axes(evals, evecs):
@@ -301,12 +312,14 @@ def get_pca_frame(pos, cmat, scale=500.0):
     # print(pcaFrame)
     return pcaFrame, tmat
 
+
 # quaternion helper functions
 def quat_angle(q1, q2):
     '''
     @return angle between q1, q1 in radians
     '''
     return np.arccos(2 * (np.dot(q1, q2))**2 - 1)
+
 
 # for get_pca_frame_quat, not used
 def closest_orientation(evals, evecs):
@@ -337,6 +350,7 @@ def closest_orientation(evals, evecs):
     smallest_angle = np.argmin(angles)
 
     return rs[smallest_angle], np.array(es[smallest_angle])
+
 
 # get pca frame closest to world-frame via quat orientation distance
 # does not return desired frame as well as silly method (highest magnitude positive z-axis)
