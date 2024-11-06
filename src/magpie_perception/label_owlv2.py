@@ -61,7 +61,10 @@ class LabelOWLv2(Label):
         self.image = img = np.asarray(input_image)
         img_tensor = torch.tensor(img, dtype=torch.float32)
         inputs = self.processor(input_labels, images=img_tensor, padding=True, return_tensors="pt").to(self.device)
-        outputs = self.model(**inputs)
+
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+        
         self.dims = img.shape[:2][::-1] # TODO: check if this is correct
         self.W = self.dims[0]
         self.H = self.dims[1]
