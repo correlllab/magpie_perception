@@ -143,6 +143,18 @@ def apply_extrinsics(pcd):
     return pcd
 
 
+def get_masked_cpcd( rgbd_image, mask, rsc, NB = 5 ):
+    """ Build a PCD, but only from the `mask`: Simplified version of `get_segment` """
+    # `get_segment`: Why should I always give a list of bboxes if I only ever select one?
+    dm   = create_depth_mask_from_mask( mask, rgbd_image.depth )
+    cpcd = crop_and_denoise_pcd( dm, rgbd_image, rsc, NB = NB )
+    cpcd = apply_extrinsics( cpcd )
+    # Copy hack
+    rgbd_image.color = copy.deepcopy( rgbd_image.color )
+    rgbd_image.depth = copy.deepcopy( rgbd_image.depth )
+    return rgbd_image, cpcd
+
+
 def get_segment(segments, index, rgbd_image, rsc, type="box", viz_scale=1500.0, method='iterative', display=True):
     '''
     @param segments list of Open3D point cloud segments
