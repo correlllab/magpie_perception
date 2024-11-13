@@ -10,14 +10,14 @@ from open3d.web_visualizer import draw
 import copy
 
 
-def create_depth_mask_from_mask(mask, orig_depth):
+def create_depth_mask_from_mask( mask, orig_depth ):
     '''
     @param mask np.array of item mask
     @param orig_depth Open3D Image
     '''
     # depth_m_array = np.zeros_like(np.asarray(orig_depth))
     depth_m_array = np.asarray(orig_depth)
-    depth_m_array[~mask] = 0
+    depth_m_array[mask < 0.0005] = 0
     depth_m = o3d.geometry.Image((depth_m_array).astype(np.float32))
     return depth_m
 
