@@ -16,13 +16,13 @@ def create_depth_mask_from_mask( mask, orig_depth ):
     @param orig_depth Open3D Image
     '''
     # depth_m_array = np.zeros_like(np.asarray(orig_depth))
-    depth_m_array = np.asarray(orig_depth)
-    depth_m_array[mask < 0.0005] = 0
+    depth_m_array = np.asarray( orig_depth )
+    depth_m_array[ mask < 0.0005 ] = 0
     depth_m = o3d.geometry.Image((depth_m_array).astype(np.float32))
     return depth_m
 
 
-def crop_and_denoise_pcd(depth_m, orig_pcd, rsc, NB=50):
+def crop_and_denoise_pcd( depth_m, orig_pcd, rsc, NB = 50 ):
     '''
     @param depth_m Open3D Image, single channel depth image
     @param orig_pcd uncropped Open3D point cloud
@@ -45,7 +45,7 @@ def crop_and_denoise_pcd(depth_m, orig_pcd, rsc, NB=50):
     )
 
     # denoise pcd
-    cl, ind = cpcd.remove_statistical_outlier(nb_neighbors=NB, std_ratio=0.01)
+    cl, ind = cpcd.remove_statistical_outlier( nb_neighbors=NB, std_ratio=0.01)
     inlier_cloud = cpcd.select_by_index(ind)
     # display_inlier_outlier(saved_pcd, ind)
     # displayWorld(inlier_cloud)
