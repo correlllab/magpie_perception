@@ -17,7 +17,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  'torch',
   'numpy',
   'transformers',
   'matplotlib',
@@ -25,8 +24,9 @@ dependencies = [
   'opencv-python',
   'open3d',
   'scipy',
-  'accelerate'
 ]
+
+# removed torch, accelerate dependencies
 
 [project.urls]
 Homepage = "https://github.com/correlllab/magpie_perception"
