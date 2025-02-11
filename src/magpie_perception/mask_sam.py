@@ -19,8 +19,10 @@ class MaskSAM(Mask):
         # self.sam = build_sam()
         # self.predictor = SamPredictor(self.sam)
         if ckpt is None:
-            ckpt = "/home/will/workspace/owlvit_segment_anything/sam_vit_h_4b8939.pth"
-        self.predictor = SamPredictor(build_sam(checkpoint=ckpt))
+            # ckpt = "/home/will/workspace/owlvit_segment_anything/sam_vit_h_4b8939.pth"
+            ckpt = "facebook/sam-vit-huge"
+        # self.predictor = SamPredictor(build_sam(checkpoint=ckpt))
+        self.predictor = SamPredictor.from_pretrained(checkpoint=ckpt)
         self.dims = None
         self.H = None
         self.W = None
