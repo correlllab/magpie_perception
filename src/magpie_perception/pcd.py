@@ -45,7 +45,7 @@ def crop_and_denoise_pcd( depth_m, orig_pcd, rsc, NB = 50 ):
     )
 
     # denoise pcd
-    cl, ind = cpcd.remove_statistical_outlier( nb_neighbors=NB, std_ratio=0.01)
+    cl, ind = cpcd.remove_statistical_outlier( nb_neighbors=NB, std_ratio=0.01 )
     inlier_cloud = cpcd.select_by_index(ind)
     # display_inlier_outlier(saved_pcd, ind)
     # displayWorld(inlier_cloud)
