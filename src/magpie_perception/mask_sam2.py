@@ -5,8 +5,8 @@
 import sys
 sys.path.append("../")
 sys.path.append("../../")
-from magpie_perception.sam2.build_sam import build_sam2
-from magpie_perception.sam2.sam2_image_predictor import SAM2ImagePredictor
+from sam2.build_sam import build_sam2
+from sam2.sam2_image_predictor import SAM2ImagePredictor
 import torch
 import copy
 import cv2
