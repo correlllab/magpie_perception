@@ -2,6 +2,9 @@
 @file mask_sam.py
 @brief Segment Anything Model (SAM) implementaion of mask.py
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import sys
 sys.path.append("../")
 from segment_anything import build_sam, SamPredictor 
@@ -11,7 +14,6 @@ import cv2
 import numpy as np
 from magpie_perception.mask import Mask
 # from magpie_perception.mask import Mask
-import matplotlib.pyplot as plt
 
 class MaskSAM(Mask):
     def __init__(self, ckpt=None):

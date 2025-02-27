@@ -2,22 +2,28 @@
 @file label_owlvit.py
 @brief OWL-ViT implementation of label.py
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import sys
 sys.path.append("../")
 import torch
 import numpy as np
 from magpie_perception.label import Label
 from transformers import OwlViTProcessor, OwlViTForObjectDetection
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from PIL import Image
 
 class LabelOWLViT(Label):
-    def __init__(self, topk=3, score_threshold=0.005, pth="google/owlvit-base-patch32"):
+    def __init__(self, topk=3, score_threshold=0.005):
         '''
         @param camera camera object, expects realsense_wrapper
         '''
         super().__init__()
+        self.SCORE_THRESHOLD = score_threshold
+        self.TOP_K = topk
+
+    def init(self, topk=3, score_threshold=0.005, pth="google/owlvit-base-patch32"):
         self.processor = OwlViTProcessor.from_pretrained(pth)
         self.model = OwlViTForObjectDetection.from_pretrained(pth)
         self.SCORE_THRESHOLD = score_threshold

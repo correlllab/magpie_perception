@@ -2,11 +2,13 @@
 @file mask.py
 @brief segmentation wrapper to retrieve object mask(s), given image and input labels
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.patches as patches
 import os
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 class Mask:
     def __init__(self):
@@ -56,5 +58,4 @@ class Mask:
         predicted_image = predicted_image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
         self.pred_image = predicted_image
         if not show_plot:
-            plt.close()
             plt.close(fig)
