@@ -166,6 +166,8 @@ def get_segment(segments, index, rgbd_image, rsc, type="box", viz_scale=1500.0, 
     dm = None
     cpcd = None
     pcaFrame, tmat = None, None
+    if type not in ["box", "box-dbscan", "mask"]:
+        raise ValueError("Invalid type. Choose from 'box', 'box-dbscan', or 'mask'.")
 
     if type == "box" or type == "box-dbscan":
         dm, rm, imgm = retrieve_mask_from_image_crop(segments[index][0], rgbd_image)
