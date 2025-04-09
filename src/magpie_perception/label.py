@@ -56,7 +56,7 @@ class Label:
         plt.axis('off')
         plt.show()
 
-    def plot_predictions(self, index=-1, topk=False, show_plot=True):
+    def plot_predictions(self, index=-1, topk=False, use_topk=False, show_plot=True):
         fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
         input_image = self.image

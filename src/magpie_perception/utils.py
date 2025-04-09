@@ -34,6 +34,74 @@ def label_wrist_image(wrist_img):
 
     return wrist_img
 
+def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsics, axis_length=0.1):
+    '''
+    Overlays 3D coordinate axes (X, Y, Z) onto an image using the provided rotation matrix
+    and camera intrinsics.
+
+    Parameters:
+        wrist_img (np.ndarray): The input image.
+        rotation_matrix (np.ndarray): A 3x3 rotation matrix.
+        camera_intrinsics (np.ndarray): A 3x3 camera intrinsics matrix.
+        axis_length (float): Length of the axis vectors in meters or arbitrary units.
+
+    Returns:
+        np.ndarray: The labeled image.
+    '''
+    h, w, _ = wrist_img.shape
+
+    # Define axis colors: X (green), Y (blue), Z (red)
+    colors = {
+        'x': (0, 255, 0),
+        'y': (0, 0, 255),
+        'z': (255, 0, 0)
+    }
+
+    def compute_center_3d(intrinsics, image_shape, depth=0.1):
+        h, w = image_shape[:2]
+        cx = intrinsics[0, 2]
+        cy = intrinsics[1, 2]
+        fx = intrinsics[0, 0]
+        fy = intrinsics[1, 1]
+
+        # Image center pixel coordinates
+        u, v = w // 2, h // 2
+
+        # Back-project pixel (u, v) at given depth
+        x = (u - cx) * depth / fx
+        y = (v - cy) * depth / fy
+        z = depth
+        return np.array([[x, y, z]], dtype=np.float32).T  # shape (3, 1)
+
+    # Center point in 3D (e.g., origin in camera frame)
+    origin_3d = compute_center_3d(camera_intrinsics, wrist_img.shape, depth=0.1)
+
+    # Define axis endpoints in 3D using the rotation matrix
+    axes_3d = {
+        'x': origin_3d + rotation_matrix @ np.array([[axis_length, 0, 0]]).T,
+        'y': origin_3d + rotation_matrix @ np.array([[0, axis_length, 0]]).T,
+        'z': origin_3d + rotation_matrix @ np.array([[0, 0, axis_length]]).T,
+    }
+
+    # Project 3D points to 2D using the camera intrinsics
+    def project(point_3d):
+        point_cam = point_3d
+        # if point_cam[2] <= 1e-6:
+        #     return None  # or (0, 0), or raise an exception
+        point_proj = camera_intrinsics @ point_cam
+        point_proj /= point_proj[2]
+        return int(point_proj[0]), int(point_proj[1])
+
+    center_2d = project(origin_3d)
+
+    for axis, end_3d in axes_3d.items():
+        end_2d = project(end_3d)
+        cv2.arrowedLine(wrist_img, center_2d, end_2d, colors[axis], 6, tipLength=0.1)
+        label_pos = (end_2d[0] + 5, end_2d[1] + 5)
+        cv2.putText(wrist_img, f"+{axis.upper()}", label_pos, cv2.FONT_HERSHEY_SIMPLEX, 1.5, colors[axis], 4)
+
+    return wrist_img
+
 def find_object(rgbd_img, query, label_model, mask_model, seg_type, wrist_camera):
     img = np.array(rgbd_img.color)
     label_model.TOP_K = 1
