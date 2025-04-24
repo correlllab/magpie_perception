@@ -10,9 +10,9 @@ def label_wrist_image(wrist_img):
     '''
     h, w, c = wrist_img.shape
 
-    x_color = (0, 255, 0) # green
-    y_color = (0, 0, 255) # blue
-    z_color = (255, 0, 0) # red
+    x_color = (255, 0, 0) # red
+    y_color = (0, 255, 0) # green
+    z_color = (0, 0, 255) # blue
 
     # Define axis line lengths (adjust as needed)
     axis_length = min(w, h) // 3
