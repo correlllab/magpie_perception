@@ -52,9 +52,9 @@ def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsic
 
     # Define axis colors: X (green), Y (blue), Z (red)
     colors = {
-        'x': (0, 255, 0),
-        'y': (0, 0, 255),
-        'z': (255, 0, 0)
+        'x': (255, 0, 0),
+        'y': (0, 255, 0),
+        'z': (0, 0, 255),
     }
 
     def compute_center_3d(intrinsics, image_shape, depth=0.1):
