@@ -34,7 +34,7 @@ def label_wrist_image(wrist_img):
 
     return wrist_img
 
-def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsics, axis_length=0.1):
+def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsics, axis_length=0.1, origin=None):
     '''
     Overlays 3D coordinate axes (X, Y, Z) onto an image using the provided rotation matrix
     and camera intrinsics.
@@ -44,37 +44,40 @@ def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsic
         rotation_matrix (np.ndarray): A 3x3 rotation matrix.
         camera_intrinsics (np.ndarray): A 3x3 camera intrinsics matrix.
         axis_length (float): Length of the axis vectors in meters or arbitrary units.
+        origin (tuple or None): Optional (x, y) pixel coordinates to plot the axes. If None, uses image center.
 
     Returns:
         np.ndarray: The labeled image.
     '''
     h, w, _ = wrist_img.shape
 
-    # Define axis colors: X (green), Y (blue), Z (red)
+    # Define axis colors: X (red), Y (green), Z (blue)
     colors = {
         'x': (255, 0, 0),
         'y': (0, 255, 0),
         'z': (0, 0, 255),
     }
 
-    def compute_center_3d(intrinsics, image_shape, depth=0.1):
-        h, w = image_shape[:2]
+    def pixel_to_3d(u, v, intrinsics, depth=0.1):
+        """Back-project 2D pixel (u,v) to 3D point assuming fixed depth."""
         cx = intrinsics[0, 2]
         cy = intrinsics[1, 2]
         fx = intrinsics[0, 0]
         fy = intrinsics[1, 1]
 
-        # Image center pixel coordinates
-        u, v = w // 2, h // 2
-
-        # Back-project pixel (u, v) at given depth
         x = (u - cx) * depth / fx
         y = (v - cy) * depth / fy
         z = depth
         return np.array([[x, y, z]], dtype=np.float32).T  # shape (3, 1)
 
-    # Center point in 3D (e.g., origin in camera frame)
-    origin_3d = compute_center_3d(camera_intrinsics, wrist_img.shape, depth=0.1)
+    # Choose center pixel
+    if origin is not None:
+        u, v = origin  # User-specified origin (already pixel coordinates)
+    else:
+        u, v = w // 2, h // 2  # Image center
+
+    # Compute the 3D point corresponding to the pixel
+    origin_3d = pixel_to_3d(u, v, camera_intrinsics, depth=0.1)
 
     # Define axis endpoints in 3D using the rotation matrix
     axes_3d = {
@@ -83,16 +86,13 @@ def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsic
         'z': origin_3d + rotation_matrix @ np.array([[0, 0, axis_length]]).T,
     }
 
-    # Project 3D points to 2D using the camera intrinsics
     def project(point_3d):
-        point_cam = point_3d
-        # if point_cam[2] <= 1e-6:
-        #     return None  # or (0, 0), or raise an exception
-        point_proj = camera_intrinsics @ point_cam
+        """Projects a 3D point to 2D pixel coordinates."""
+        point_proj = camera_intrinsics @ point_3d
         point_proj /= point_proj[2]
         return int(point_proj[0]), int(point_proj[1])
 
-    center_2d = project(origin_3d)
+    center_2d = (int(u), int(v))  # We already know pixel center
 
     for axis, end_3d in axes_3d.items():
         end_2d = project(end_3d)
