@@ -94,11 +94,27 @@ def label_wrist_image_rotation_axes(wrist_img, rotation_matrix, camera_intrinsic
 
     center_2d = (int(u), int(v))  # We already know pixel center
 
+    # Precompute projected endpoints and their lengths
+    axis_endpoints = []
     for axis, end_3d in axes_3d.items():
         end_2d = project(end_3d)
+        dx = end_2d[0] - center_2d[0]
+        dy = end_2d[1] - center_2d[1]
+        length = np.hypot(dx, dy)  # Euclidean distance
+        axis_endpoints.append((length, axis, end_2d))
+
+    # Sort by length, longer first, shorter last
+    axis_endpoints.sort(reverse=True)
+
+    for _, axis, end_2d in axis_endpoints:
         cv2.arrowedLine(wrist_img, center_2d, end_2d, colors[axis], 6, tipLength=0.1)
         label_pos = (end_2d[0] + 5, end_2d[1] + 5)
         cv2.putText(wrist_img, f"+{axis.upper()}", label_pos, cv2.FONT_HERSHEY_SIMPLEX, 1.5, colors[axis], 4)
+    # for axis, end_3d in axes_3d.items():
+    #     end_2d = project(end_3d)
+    #     cv2.arrowedLine(wrist_img, center_2d, end_2d, colors[axis], 6, tipLength=0.1)
+    #     label_pos = (end_2d[0] + 5, end_2d[1] + 5)
+    #     cv2.putText(wrist_img, f"+{axis.upper()}", label_pos, cv2.FONT_HERSHEY_SIMPLEX, 1.5, colors[axis], 4)
 
     return wrist_img
 
