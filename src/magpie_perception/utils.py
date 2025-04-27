@@ -3,6 +3,78 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 from magpie_perception import pcd
+import itertools
+from spatialmath import SO3
+from scipy.spatial.transform import Rotation as R
+
+def optimize_and_correct_frame(R_input, step_angle=90):
+    """
+    Optimize rotation to align frame to canonical and return corrected frame while maintaining orientation 'essence' of input.
+    Canonical frame being the egocentric world frame in which +Z is up in the world, +X is right in the world, +Y is forward in the world.
+
+    Args:
+        R_input (np.ndarray): 3x3 rotation matrix representing arbitrary frame.
+        step_angle (int): 90 (default) or 180 degrees allowed.
+
+    Returns:
+        np.ndarray: Corrected 3x3 rotation matrix (after applying best correction).
+    """
+    def frame_alignment_error(R_frame):
+        R_err = R_frame.T
+        return R.from_matrix(R_err).magnitude()
+
+    angles = [np.pi] if step_angle == 180 else [np.pi/2, -np.pi/2, np.pi]
+    moves = [(axis, angle) for axis in range(3) for angle in angles]
+
+    best_error = np.inf
+    best_rotation = np.eye(3)
+
+    for n in [1,2,3]:
+        for seq in itertools.product(moves, repeat=n):
+            R_total = np.eye(3)
+            for axis, angle in seq:
+                if axis == 0: R_step = SO3.Rx(angle).A
+                elif axis == 1: R_step = SO3.Ry(angle).A
+                else: R_step = SO3.Rz(angle).A
+                R_total = R_total @ R_step
+            R_candidate = R_input @ R_total
+            err = frame_alignment_error(R_candidate)
+            if err < best_error:
+                best_error = err
+                best_rotation = R_total
+
+    R_corrected = R_input @ best_rotation
+    return R_corrected, best_rotation
+
+def plot_frames_3d(R_input, R_corrected, R_best_rotation):
+    """Plot canonical, input, corrected, and corrected-inverse frames."""
+    def plot_frame(ax, R_frame, label, origin, scale=0.2):
+        colors = ['r', 'g', 'b']
+        for i in range(3):
+            vec = R_frame[:,i] * scale
+            ax.quiver(*origin, *vec, color=colors[i])
+        ax.text(*origin, label, fontsize=10)
+
+    fig = plt.figure(figsize=(10,8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Frames
+    plot_frame(ax, np.eye(3), 'Canonical', origin=np.array([0,0,0]))
+    plot_frame(ax, R_input, 'Original', origin=np.array([0.5,0,0]))
+    plot_frame(ax, R_corrected, 'Corrected', origin=np.array([1.0,0,0]))
+
+    R_recovered = R_corrected @ R_best_rotation.T
+    plot_frame(ax, R_recovered, 'Recovered', origin=np.array([1.5,0,0]))
+
+    ax.set_xlim([-0.5,2.0])
+    ax.set_ylim([-1.5,1.5])
+    ax.set_zlim([-1.5,1.5])
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('Frame Alignment Visualization')
+    plt.tight_layout()
+    plt.show()
 
 def label_wrist_image(wrist_img):
     '''
