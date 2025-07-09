@@ -2,18 +2,20 @@
 @file mask_sam.py
 @brief Segment Anything Model (SAM) implementaion of mask.py
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import sys
 sys.path.append("../")
 sys.path.append("../../")
-from magpie_perception.sam2.build_sam import build_sam2
-from magpie_perception.sam2.sam2_image_predictor import SAM2ImagePredictor
+from sam2.build_sam import build_sam2
+from sam2.sam2_image_predictor import SAM2ImagePredictor
 import torch
 import copy
 import cv2
 import numpy as np
 from magpie_perception.mask import Mask
 # from magpie_perception.mask import Mask
-import matplotlib.pyplot as plt
 
 class MaskSAM2(Mask):
     def __init__(self, ckpt=None):

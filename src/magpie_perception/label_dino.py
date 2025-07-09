@@ -10,22 +10,28 @@ Available models:
 IDEA-Research/grounding-dino-tiny
 IDEA-Research/grounding-dino-base
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import sys
 sys.path.append("../")
 import torch
 import numpy as np
 from magpie_perception.label import Label
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from PIL import Image
 
 class LabelDINO(Label):
-    def __init__(self, topk=3, score_threshold=0.005, pth="IDEA-Research/grounding-dino-tiny"):
+    def __init__(self, topk=3, score_threshold=0.005):
         '''
         @param camera camera object, expects realsense_wrapper
         '''
         super().__init__()
+        self.SCORE_THRESHOLD = score_threshold
+        self.TOP_K = topk
+
+    def init(self, topk=3, score_threshold=0.005, pth="IDEA-Research/grounding-dino-tiny"):
         self.processor = AutoProcessor.from_pretrained(pth)
         self.model = AutoModelForZeroShotObjectDetection.from_pretrained(pth).to(self.device)
         self.SCORE_THRESHOLD = score_threshold

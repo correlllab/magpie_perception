@@ -24,6 +24,7 @@ dependencies = [
   'opencv-python',
   'open3d',
   'scipy',
+  'imutils',
 ]
 
 # removed torch, accelerate dependencies

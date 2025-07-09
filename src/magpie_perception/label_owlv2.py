@@ -2,6 +2,10 @@
 @file label_owlv2.py
 @brief OWLv2 implementation of label.py
 '''
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import sys
 sys.path.append("../")
 import torch
@@ -9,18 +13,20 @@ import numpy as np
 from magpie_perception.label import Label
 from transformers import Owlv2Processor, Owlv2ForObjectDetection
 from transformers.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from PIL import Image
 
 class LabelOWLv2(Label):
-    def __init__(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble", cpu_override=True):
+    def __init__(self, topk=3, score_threshold=0.005):
         '''
         @param camera camera object, expects realsense_wrapper
         '''
-        super().__init__(cpu_override=cpu_override)
+        super().__init__()
+        self.SCORE_THRESHOLD = score_threshold
+        self.TOP_K = topk
+
+    def init(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble"):
         self.processor = Owlv2Processor.from_pretrained(pth)
-        self.model = Owlv2ForObjectDetection.from_pretrained(pth, device_map=self.device)
+        self.model = Owlv2ForObjectDetection.from_pretrained(pth)
         self.SCORE_THRESHOLD = score_threshold
         self.TOP_K = topk
 
