@@ -23,7 +23,14 @@ class LabelOWLv2(Label):
         self.model = Owlv2ForObjectDetection.from_pretrained(pth, device_map=self.device)
         self.SCORE_THRESHOLD = score_threshold
         self.TOP_K = topk
-    
+
+
+    def scale_thresh_by_factor( self, factor ):
+        """ Adjust the threshold by some factor """
+        self.SCORE_THRESHOLD *= factor
+        return self.SCORE_THRESHOLD
+
+
     def get_preds(self, outputs, target_sizes):
         logits = torch.max(outputs["logits"][0], dim=-1)
         scores = torch.sigmoid(logits.values).cpu().detach().numpy()
