@@ -16,15 +16,9 @@ from transformers.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
 from PIL import Image
 
 class LabelOWLv2(Label):
-    def __init__(self, topk=3, score_threshold=0.005):
-        '''
-        @param camera camera object, expects realsense_wrapper
-        '''
-        super().__init__()
-        self.SCORE_THRESHOLD = score_threshold
-        self.TOP_K = topk
 
-    def init(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble"):
+    def __init__(self, topk=3, score_threshold=0.005, pth="google/owlv2-base-patch16-ensemble"):
+        super().__init__()
         self.processor = Owlv2Processor.from_pretrained(pth)
         self.model = Owlv2ForObjectDetection.from_pretrained(pth)
         self.SCORE_THRESHOLD = score_threshold
